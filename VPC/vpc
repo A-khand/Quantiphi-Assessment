@@ -144,7 +144,7 @@ sec_data = ec2_client.authorize_security_group_ingress(
 
 # create bastion host
 bastion_host = ec2.create_instances(
-    ImageId='ami-062f7200baf2fa504',
+    ImageId='',
     MinCount=1,
     MaxCount=1,
     InstanceType='t2.micro',
@@ -152,7 +152,7 @@ bastion_host = ec2.create_instances(
     SecurityGroups=[
         bastion_sec_group.id,
     ],
-    KeyName='test-keyfile'
+    KeyName='amy-keyfile'
 )
 
 private_host = ec2.create_instances(
