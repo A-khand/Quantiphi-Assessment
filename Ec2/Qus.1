@@ -1,0 +1,59 @@
+import boto3
+import time
+
+region = 'us-east-1'
+instance_id = input("Enter Instance Id: ")
+ameyec2 = boto3.client('ec2', region_name=region)
+ameyec22=boto3.resource('ec2', region_name=region)
+
+#STARTing the instance
+ec2.start_instances(InstanceIds=[instance_id])
+print('started: ' + instance_id)
+
+time.sleep(100)
+
+#STOP the instance
+ec2.stop_instances(InstanceIds=[instance_id])
+print('stopped your instances: ' + instance_id)
+
+time.sleep(100)
+
+#SNAPSHOT
+instance=ameyec22.Instance(instance_id)
+volumes=instance.volumes.all()
+
+volumes_dict = {
+                'amey-snap' : 'v_id',                
+        }
+       
+for i in volumes:
+ if i not in volumes_dict.keys():
+   volumes_dict['amey-snap']=i.id
+ print(i.id)
+
+
+
+successful_snapshots = dict()
+for snapshot in volumes_dict:
+  try:
+      response = ameyec2.create_snapshot(
+          
+          VolumeId= volumes_dict[snapshot],
+          DryRun= False
+      )
+      status_code = response['ResponseMetadata']['HTTPStatusCode']
+      snapshot_id = response['SnapshotId']
+     
+      if status_code == 100:
+          successful_snapshots[snapshot] = snapshot_id
+  except Exception as e:
+      exception_message = " error in creating snap " + snapshot + " with volume id "+volumes_dict[snapshot]+" and error is: \n"\
+                          + str(e)
+
+print(successful_snapshots)
+
+time.sleep(100)
+
+#TERMINATE
+ec2.terminate_instances(InstanceIds=[instance_id])
+
